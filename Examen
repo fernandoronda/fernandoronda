@@ -1,0 +1,121 @@
+import datetime
+
+entradas_disponibles = [i for i in range(1, 101)]
+entradas_vendidas = []
+asistentes = {}
+precios = {"platinum": 120000, "gold": 80000, "silver": 50000}
+
+# Funciones
+def mostrar_menu():
+    print("----- Menú -----")
+    print("1. Comprar entradas")
+    print("2. Mostrar ubicaciones disponibles")
+    print("3. Ver listado de asistentes")
+    print("4. Mostrar ganancias totales")
+    print("5. Salir")
+
+def comprar_entradas():
+    cantidad = int(input("Ingrese la cantidad de entradas a comprar (entre 1 y 3): "))
+    
+    if cantidad < 1 or cantidad > 3:
+        print("Cantidad inválida. Intente nuevamente.")
+        return
+    
+    print("Ubicaciones disponibles:")
+    mostrar_ubicaciones()
+    
+    for i in range(cantidad):
+        ubicacion = seleccionar_ubicacion()
+        
+        if ubicacion == -1:
+            print("Ubicación no disponible. Intente nuevamente.")
+            return
+        
+        tipo_entrada = determinar_tipo_entrada(ubicacion)
+        precio_entrada = precios[tipo_entrada]
+        asistente_run = input("Ingrese el RUN del asistente: ")
+        
+        if asistente_run in asistentes:
+            print("Asistente ya registrado. Intente nuevamente.")
+            return
+        
+        asistentes[asistente_run] = {"ubicacion": ubicacion, "tipo_entrada": tipo_entrada}
+        entradas_vendidas.append(ubicacion)
+        
+        print("Operación realizada correctamente.")
+        print(f"Monto a pagar: ${precio_entrada}\n")
+    
+def mostrar_ubicaciones():
+    for i in range(1, 101):
+        if i in entradas_vendidas:
+            print(f"{i}\tX", end="\t")
+        else:
+            print(i, end="\t")
+        
+        if i % 10 == 0:
+            print()
+    
+def seleccionar_ubicacion():
+    ubicacion = int(input("Seleccione una ubicación: "))
+    
+    if ubicacion in entradas_vendidas:
+        return -1
+    
+    return ubicacion
+
+def determinar_tipo_entrada(ubicacion):
+    if ubicacion <= 20:
+        return "platinum"
+    elif ubicacion <= 50:
+        return "gold"
+    else:
+        return "silver"
+
+def mostrar_listado_asistentes():
+    if not asistentes:
+        print("No hay asistentes registrados.")
+        return
+    
+    print("Listado de asistentes:")
+    for run, datos in sorted(asistentes.items()):
+        print(f"RUN: {run}\tUbicación: {datos['ubicacion']}\tTipo de entrada: {datos['tipo_entrada']}")
+    
+def mostrar_ganancias_totales():
+    if not asistentes:
+        print("No hay asistentes registrados.")
+        return
+    
+    ganancias = {"platinum": 0, "gold": 0, "silver": 0}
+    
+    for datos in asistentes.values():
+        tipo_entrada = datos["tipo_entrada"]
+        ganancias[tipo_entrada] += precios[tipo_entrada]
+    
+    print("Tipo Entrada\tCantidad\tTotal")
+    for tipo, cantidad in ganancias.items():
+        print(f"{tipo}\t\t{cantidad // precios[tipo]}\t\t${cantidad}")
+    
+def salir():
+    nombre = input("Ingrese su nombre: ")
+    apellido = input("Ingrese su apellido: ")
+    fecha_actual = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    
+    print(f"\nGracias por utilizar el sistema, {nombre} {apellido}.\nFecha y hora de salida: {fecha_actual}")
+
+while True:
+    mostrar_menu()
+    opcion = input("Seleccione una opción: ")
+    
+    if opcion == "1":
+        comprar_entradas()
+    elif opcion == "2":
+        mostrar_ubicaciones()
+    elif opcion == "3":
+        mostrar_listado_asistentes()
+    elif opcion == "4":
+        mostrar_ganancias_totales()
+    elif opcion == "5":
+        salir()
+        break
+    else:
+        print("Opción inválida. Intente nuevamente.\n")
